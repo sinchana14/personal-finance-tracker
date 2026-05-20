@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================
+  POM.XML — Project Object Model
+  ============================================================
+  
+  WHAT IS THIS FILE?
+  This is Maven's configuration file. Think of Maven as a "project manager" 
+  that handles:
+    1. Downloading libraries (dependencies) your project needs
+    2. Compiling your Java code
+    3. Running tests
+    4. Packaging your app into a runnable JAR file
+  
+  HOW DOES IT WORK?
+  - You declare what libraries you need (like Spring Boot, H2 Database, etc.)
+  - Maven automatically downloads them from the internet (Maven Central Repository)
+  - It also downloads any libraries THOSE libraries need (transitive dependencies)
+  
+  ANALOGY: Think of it like a recipe. You list ingredients (dependencies), 
+  and Maven goes to the store (Maven Central) to buy them for you.
+  ============================================================
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+      PARENT: spring-boot-starter-parent
+      Instead of configuring everything from scratch, we inherit from 
+      Spring Boot's parent POM. This gives us:
+        - Pre-configured plugin versions
+        - Dependency version management (no need to specify versions for common libs)
+        - Sensible defaults for Java compilation
+      Think of it as a "template" that Spring Boot provides.
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.5</version>
+        <relativePath/> <!-- lookup parent from Maven Central -->
+    </parent>
+
+    <!--
+      PROJECT COORDINATES — Uniquely identify YOUR project
+      - groupId:    Your organization (like a domain name reversed)
+      - artifactId: Your project name
+      - version:    Current version (SNAPSHOT = still in development)
+    -->
+    <groupId>com.finance</groupId>
+    <artifactId>tracker</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>Personal Finance Tracker</name>
+    <description>A full-stack personal finance tracking application</description>
+
+    <!--
+      PROPERTIES — Variables you can reuse throughout the POM
+      java.version tells Spring Boot which Java version to compile for.
+    -->
+    <properties>
+        <java.version>17</java.version>
+        <jjwt.version>0.12.6</jjwt.version>
+    </properties>
+
+    <!--
+      DEPENDENCIES — The libraries (ingredients) our project needs
+      Each dependency has:
+        - groupId + artifactId: identifies the library
+        - scope: when it's needed (compile, runtime, test)
+    -->
+    <dependencies>
+        
+        <!--
+          ========== SPRING BOOT STARTERS ==========
+          "Starters" are convenience packages that bundle related dependencies.
+          Instead of adding 10 individual libraries, you add 1 starter.
+        -->
+
+        <!-- 
+          spring-boot-starter-web: Everything needed to build REST APIs
+          Includes: Spring MVC, Embedded Tomcat server, JSON serialization (Jackson)
+          This is why you DON'T need to install a separate web server!
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!--
+          spring-boot-starter-data-jpa: Database access via JPA/Hibernate
+          JPA = Java Persistence API (a specification for ORM)
+          Hibernate = The most popular JPA implementation
+          ORM = Object-Relational Mapping (maps Java objects ↔ database tables)
+          
+          Instead of writing raw SQL for everything, you work with Java objects,
+          and Hibernate translates them to SQL automatically.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!--
+          spring-boot-starter-validation: Input validation annotations
+          Lets you add @NotNull, @Email, @Size etc. to validate user input
+          automatically before it reaches your business logic.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!--
+          spring-boot-starter-security: Authentication & Authorization
+          Provides the framework for login, JWT tokens, password hashing,
+          and protecting API endpoints.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!--
+          ========== DATABASE ==========
+        -->
+
+        <!--
+          H2 Database: An in-memory database that runs inside your app
+          Perfect for development — no installation needed!
+          Data lives in memory (resets on restart) or can be file-based.
+          
+          "runtime" scope means it's only needed when running, not compiling.
+        -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!--
+          MySQL Connector: Driver to connect to a real MySQL database
+          Used when you deploy to production. We keep it here but use H2 for dev.
+        -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!--
+          ========== JWT (JSON Web Tokens) ==========
+          Used for stateless authentication. After login, the server gives
+          the client a signed token. The client sends this token with every
+          request to prove who they are.
+          
+          We need 3 libraries:
+          1. jjwt-api:  The API/interfaces
+          2. jjwt-impl: The implementation
+          3. jjwt-jackson: JSON serialization for JWT
+        -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>${jjwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>${jjwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!--
+          ========== UTILITIES ==========
+        -->
+
+        <!--
+          Lombok: Reduces boilerplate code (getters, setters, constructors)
+          Instead of writing 50 lines of getters/setters, you add @Data annotation.
+          It generates code at COMPILE TIME (not runtime), so there's zero overhead.
+        -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!--
+          SpringDoc OpenAPI: Auto-generates API documentation (Swagger UI)
+          Visit /swagger-ui.html to see a beautiful, interactive API docs page.
+        -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.6.0</version>
+        </dependency>
+
+        <!--
+          ========== TESTING ==========
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <!--
+      BUILD PLUGINS — Tools that run during the build process
+    -->
+    <build>
+        <plugins>
+            <!--
+              Spring Boot Maven Plugin: Packages your app into a single runnable JAR
+              Run with: mvn spring-boot:run (development)
+              Or build: mvn clean package (creates target/*.jar)
+            -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

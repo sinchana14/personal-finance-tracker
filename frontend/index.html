@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Personal Finance Tracker — Track income, expenses, budgets, and visualize your financial health with beautiful charts.">
+    <title>FinTrack — Personal Finance Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- ============================================================
+         LOGIN / REGISTER PAGE
+         ============================================================ -->
+    <div id="auth-page" class="page active">
+        <div class="auth-container">
+            <div class="auth-branding">
+                <div class="auth-logo">
+                    <span class="logo-icon">💰</span>
+                    <h1>FinTrack</h1>
+                </div>
+                <p class="auth-tagline">Take control of your finances.<br>Track. Budget. Grow.</p>
+                <div class="auth-features">
+                    <div class="auth-feature"><span>📊</span> Visual spending insights</div>
+                    <div class="auth-feature"><span>🎯</span> Smart budget tracking</div>
+                    <div class="auth-feature"><span>📈</span> Monthly trend analysis</div>
+                </div>
+            </div>
+            <div class="auth-form-wrapper">
+                <!-- Login Form -->
+                <div id="login-form" class="auth-form active">
+                    <h2>Welcome Back</h2>
+                    <p class="form-subtitle">Sign in to your account</p>
+                    <div id="login-error" class="error-message hidden"></div>
+                    <form onsubmit="handleLogin(event)">
+                        <div class="input-group">
+                            <label for="login-username">Username</label>
+                            <input type="text" id="login-username" placeholder="Enter your username" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" placeholder="Enter your password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-full" id="login-btn">
+                            <span class="btn-text">Sign In</span>
+                            <span class="btn-loader hidden"></span>
+                        </button>
+                    </form>
+                    <p class="auth-switch">Don't have an account? <a href="#" onclick="toggleAuthForm(event)">Sign Up</a></p>
+                </div>
+
+                <!-- Register Form -->
+                <div id="register-form" class="auth-form">
+                    <h2>Create Account</h2>
+                    <p class="form-subtitle">Start tracking your finances today</p>
+                    <div id="register-error" class="error-message hidden"></div>
+                    <form onsubmit="handleRegister(event)">
+                        <div class="input-group">
+                            <label for="reg-fullname">Full Name</label>
+                            <input type="text" id="reg-fullname" placeholder="Enter your full name" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="reg-username">Username</label>
+                            <input type="text" id="reg-username" placeholder="Choose a username" required minlength="3">
+                        </div>
+                        <div class="input-group">
+                            <label for="reg-email">Email</label>
+                            <input type="email" id="reg-email" placeholder="Enter your email" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="reg-password">Password</label>
+                            <input type="password" id="reg-password" placeholder="Min 6 characters" required minlength="6">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-full" id="register-btn">
+                            <span class="btn-text">Create Account</span>
+                            <span class="btn-loader hidden"></span>
+                        </button>
+                    </form>
+                    <p class="auth-switch">Already have an account? <a href="#" onclick="toggleAuthForm(event)">Sign In</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         MAIN APPLICATION
+         ============================================================ -->
+    <div id="app-page" class="page">
+        <!-- Sidebar Navigation -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo-icon">💰</span>
+                <h2>FinTrack</h2>
+            </div>
+            <div class="sidebar-user">
+                <div class="user-avatar" id="user-avatar">J</div>
+                <div class="user-info">
+                    <span class="user-name" id="user-name">John Doe</span>
+                    <span class="user-label">Personal Account</span>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard')">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </li>
+                <li class="nav-item" data-page="transactions" onclick="navigateTo('transactions')">
+                    <span class="nav-icon">💸</span>
+                    <span class="nav-text">Transactions</span>
+                </li>
+                <li class="nav-item" data-page="budgets" onclick="navigateTo('budgets')">
+                    <span class="nav-icon">🎯</span>
+                    <span class="nav-text">Budgets</span>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <button class="btn btn-ghost btn-full" onclick="handleLogout()">
+                    <span>🚪</span> Sign Out
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+                <div class="page-title">
+                    <h1 id="current-page-title">Dashboard</h1>
+                    <p class="page-date" id="current-date"></p>
+                </div>
+                <button class="btn btn-primary btn-add" onclick="openTransactionModal()">
+                    <span>+</span> Add Transaction
+                </button>
+            </header>
+
+            <!-- ========== DASHBOARD ========== -->
+            <section id="dashboard-section" class="content-section active">
+                <!-- Summary Cards -->
+                <div class="summary-cards">
+                    <div class="card summary-card income-card">
+                        <div class="card-icon">📈</div>
+                        <div class="card-content">
+                            <span class="card-label">Total Income</span>
+                            <span class="card-value" id="total-income">₹0</span>
+                        </div>
+                    </div>
+                    <div class="card summary-card expense-card">
+                        <div class="card-icon">📉</div>
+                        <div class="card-content">
+                            <span class="card-label">Total Expenses</span>
+                            <span class="card-value" id="total-expense">₹0</span>
+                        </div>
+                    </div>
+                    <div class="card summary-card balance-card">
+                        <div class="card-icon">💎</div>
+                        <div class="card-content">
+                            <span class="card-label">Balance</span>
+                            <span class="card-value" id="total-balance">₹0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="charts-row">
+                    <div class="card chart-card">
+                        <h3 class="card-title">Monthly Trend</h3>
+                        <div class="chart-container">
+                            <canvas id="monthly-trend-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card chart-card chart-card-sm">
+                        <h3 class="card-title">Expense Breakdown</h3>
+                        <div class="chart-container chart-container-sm">
+                            <canvas id="category-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Budget & Recent Transactions Row -->
+                <div class="bottom-row">
+                    <div class="card">
+                        <h3 class="card-title">Budget Status</h3>
+                        <div id="budget-status-list" class="budget-list">
+                            <p class="empty-state">No budgets set for this month. <a href="#" onclick="navigateTo('budgets')">Set one now →</a></p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">Recent Transactions</h3>
+                        <div id="recent-transactions-list" class="transaction-list">
+                            <p class="empty-state">No transactions yet. Click "Add Transaction" to start!</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== TRANSACTIONS PAGE ========== -->
+            <section id="transactions-section" class="content-section">
+                <div class="section-header">
+                    <div class="filter-bar">
+                        <div class="filter-group">
+                            <label>Type</label>
+                            <select id="filter-type" onchange="loadTransactions()">
+                                <option value="">All</option>
+                                <option value="INCOME">Income</option>
+                                <option value="EXPENSE">Expense</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>From</label>
+                            <input type="date" id="filter-start" onchange="loadTransactions()">
+                        </div>
+                        <div class="filter-group">
+                            <label>To</label>
+                            <input type="date" id="filter-end" onchange="loadTransactions()">
+                        </div>
+                        <button class="btn btn-ghost" onclick="clearFilters()">Clear</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div id="transactions-table-container" class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Category</th>
+                                    <th>Description</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactions-tbody">
+                                <tr><td colspan="6" class="empty-state">No transactions found</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== BUDGETS PAGE ========== -->
+            <section id="budgets-section" class="content-section">
+                <div class="section-header">
+                    <div class="filter-bar">
+                        <div class="filter-group">
+                            <label>Month</label>
+                            <select id="budget-month" onchange="loadBudgets()">
+                                <option value="1">January</option>
+                                <option value="2">February</option>
+                                <option value="3">March</option>
+                                <option value="4">April</option>
+                                <option value="5">May</option>
+                                <option value="6">June</option>
+                                <option value="7">July</option>
+                                <option value="8">August</option>
+                                <option value="9">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Year</label>
+                            <input type="number" id="budget-year" value="2026" min="2020" onchange="loadBudgets()">
+                        </div>
+                        <button class="btn btn-primary" onclick="openBudgetModal()">+ Add Budget</button>
+                    </div>
+                </div>
+                <div class="budgets-grid" id="budgets-grid">
+                    <p class="empty-state">No budgets set. Click "Add Budget" to create one!</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ============================================================
+         TRANSACTION MODAL
+         ============================================================ -->
+    <div id="transaction-modal" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Add Transaction</h3>
+                <button class="modal-close" onclick="closeModal('transaction-modal')">×</button>
+            </div>
+            <form id="transaction-form" onsubmit="handleTransactionSubmit(event)">
+                <div class="modal-body">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="txn-type">Type</label>
+                            <select id="txn-type" required onchange="loadCategoryOptions()">
+                                <option value="EXPENSE">Expense</option>
+                                <option value="INCOME">Income</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="txn-category">Category</label>
+                            <select id="txn-category" required></select>
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="txn-amount">Amount (₹)</label>
+                            <input type="number" id="txn-amount" placeholder="0.00" step="0.01" min="0.01" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="txn-date">Date</label>
+                            <input type="date" id="txn-date" required>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="txn-description">Description (optional)</label>
+                        <input type="text" id="txn-description" placeholder="What was this for?">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-ghost" onclick="closeModal('transaction-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="txn-submit-btn">
+                        <span class="btn-text">Save Transaction</span>
+                        <span class="btn-loader hidden"></span>
+                    </button>
+                </div>
+                <input type="hidden" id="txn-edit-id">
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         BUDGET MODAL
+         ============================================================ -->
+    <div id="budget-modal" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Set Budget</h3>
+                <button class="modal-close" onclick="closeModal('budget-modal')">×</button>
+            </div>
+            <form id="budget-form" onsubmit="handleBudgetSubmit(event)">
+                <div class="modal-body">
+                    <div class="input-group">
+                        <label for="budget-category">Category</label>
+                        <select id="budget-category" required></select>
+                    </div>
+                    <div class="input-group">
+                        <label for="budget-amount">Monthly Limit (₹)</label>
+                        <input type="number" id="budget-amount" placeholder="5000" step="0.01" min="0.01" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-ghost" onclick="closeModal('budget-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Budget</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/transactions.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

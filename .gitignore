@@ -1,0 +1,47 @@
+# ============================================================
+# .gitignore — Files that should NOT be tracked by Git
+# ============================================================
+
+# -------- Java / Maven --------
+backend/target/          # Compiled classes and packaged JAR
+*.class                  # Compiled Java bytecode
+*.jar                    # JAR packages
+*.war
+*.ear
+
+# -------- IDE Files --------
+.idea/                   # IntelliJ IDEA
+*.iml
+.vscode/                 # VS Code
+*.code-workspace
+.project                 # Eclipse
+.classpath
+.settings/
+*.swp                    # Vim
+
+# -------- Build --------
+build/
+dist/
+out/
+
+# -------- Database --------
+backend/data/            # H2 database files
+*.db
+*.mv.db
+*.trace.db
+
+# -------- OS Files --------
+.DS_Store                # macOS
+Thumbs.db                # Windows
+desktop.ini
+
+# -------- Environment --------
+.env
+*.env.local
+
+# -------- Node (if used for tools) --------
+node_modules/
+
+# -------- Logs --------
+*.log
+logs/
