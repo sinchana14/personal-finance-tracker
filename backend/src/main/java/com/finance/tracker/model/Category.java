@@ -3,6 +3,7 @@ package com.finance.tracker.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -84,11 +85,13 @@ public class Category {
     @Column(nullable = false)
     private boolean isDefault = false;
 
-    // Relationships (a category can have many transactions and budgets)
+    // @JsonIgnore prevents infinite recursion: Category → Transactions → Category → ...
+    @JsonIgnore
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     @Builder.Default
     private List<Transaction> transactions = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     @Builder.Default
     private List<Budget> budgets = new ArrayList<>();

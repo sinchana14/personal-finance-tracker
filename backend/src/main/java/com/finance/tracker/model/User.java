@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -90,6 +91,7 @@ public class User {
      * BCrypt is a one-way hash — you can verify a password against it,
      * but you can never reverse it back to the original password.
      */
+    @JsonIgnore // NEVER expose password hash in API responses
     @NotBlank(message = "Password is required")
     @Column(nullable = false)
     private String passwordHash;
@@ -133,10 +135,12 @@ public class User {
      *   LAZY  = Load on demand (better performance, default for collections)
      *   EAGER = Load immediately with the user (can cause performance issues)
      */
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default // Tells Lombok's @Builder to use this default value
     private List<Transaction> transactions = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
     private List<Budget> budgets = new ArrayList<>();
