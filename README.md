@@ -48,7 +48,7 @@ A full-stack personal finance tracking application built with **Java Spring Boot
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/personal-finance-tracker.git
+git clone https://github.com/sinchana14/personal-finance-tracker.git
 cd personal-finance-tracker
 ```
 
