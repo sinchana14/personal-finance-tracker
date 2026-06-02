@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinTrack — Interview Preparation Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.7;
+            padding: 2rem;
+        }
+        .container { max-width: 850px; margin: 0 auto; }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 2.5rem 2rem;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed, #2563eb);
+            color: white;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+        }
+        .header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .header p { font-size: 1rem; opacity: 0.9; }
+        .header .subtitle { font-size: 0.85rem; opacity: 0.7; margin-top: 0.5rem; }
+
+        /* Section */
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+        }
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #4f46e5;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Q&A */
+        .qa {
+            margin-bottom: 1.75rem;
+            padding-bottom: 1.75rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .qa:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        
+        .question {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #1e293b;
+            margin-bottom: 0.75rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+        .q-number {
+            background: #4f46e5;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .answer {
+            font-size: 0.9rem;
+            color: #475569;
+            padding-left: 2rem;
+        }
+        .answer p { margin-bottom: 0.5rem; }
+        .answer ul { padding-left: 1.25rem; margin: 0.5rem 0; }
+        .answer li { margin-bottom: 0.3rem; }
+        .answer code {
+            background: #f1f5f9;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.83rem;
+            color: #7c3aed;
+            font-family: 'Courier New', monospace;
+        }
+        .answer pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            overflow-x: auto;
+            margin: 0.75rem 0;
+            font-family: 'Courier New', monospace;
+            line-height: 1.5;
+        }
+        .tip {
+            background: #f0fdf4;
+            border-left: 3px solid #22c55e;
+            padding: 0.75rem 1rem;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.83rem;
+            color: #166534;
+            margin-top: 0.75rem;
+        }
+
+        /* Print styles */
+        @media print {
+            body { padding: 0; background: white; }
+            .header { 
+                background: #4f46e5 !important; 
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .section { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+            .qa { page-break-inside: avoid; }
+            .q-number { 
+                background: #4f46e5 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .print-btn { display: none !important; }
+        }
+
+        .print-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(79,70,229,0.4);
+            font-family: 'Inter', sans-serif;
+            z-index: 100;
+        }
+        .print-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 30px rgba(79,70,229,0.5); }
+    </style>
+</head>
+<body>
+    <button class="print-btn" onclick="window.print()">📄 Save as PDF</button>
+
+    <div class="container">
+        <div class="header">
+            <h1>💰 FinTrack — Interview Preparation Guide</h1>
+            <p>Personal Finance Tracker | Full-Stack Java Project</p>
+            <div class="subtitle">Spring Boot • Spring Security • JPA/Hibernate • JWT • REST API • HTML/CSS/JS • Chart.js</div>
+        </div>
+
+        <!-- ==================== SECTION 1 ==================== -->
+        <div class="section">
+            <h2 class="section-title">📋 Project Overview Questions</h2>
+
+            <div class="qa">
+                <div class="question"><span class="q-number">1</span> Tell me about your project. What does it do?</div>
+                <div class="answer">
+                    <p>FinTrack is a <strong>full-stack Personal Finance Tracker</strong> that helps users manage their income, expenses, and budgets. It features:</p>
+                    <ul>
+                        <li><strong>User Authentication</strong> — Secure registration and login using JWT tokens with BCrypt password hashing</li>
+                        <li><strong>Transaction Management</strong> — Full CRUD operations for income and expense tracking with category tagging</li>
+                        <li><strong>Budget Tracking</strong> — Users can set monthly spending limits per category and track their progress</li>
+                        <li><strong>Interactive Dashboard</strong> — Visual charts showing spending trends (line chart), category breakdown (doughnut chart), budget progress bars, and recent transactions</li>
+                    </ul>
+                    <p>The backend is built with <strong>Java 17 + Spring Boot 3.3</strong>, the database uses <strong>H2 (dev) / MySQL (prod)</strong>, and the frontend is a <strong>Single Page Application</strong> built with vanilla HTML/CSS/JS and Chart.js.</p>
+                </div>
+            </div>
+
+            <div class="qa">
+                <div class="question"><span class="q-number">2</span> Why did you choose this tech stack?</div>
+                <div class="answer">
+                    <ul>
+                        <li><strong>Spring Boot</strong> — Industry standard for Java backend development. Provides auto-configuration, embedded server, and a vast ecosystem (Security, Data JPA, etc.)</li>
+                        <li><strong>H2 Database</strong> — Zero-configuration embedded database, perfect for development. Can easily switch to MySQL/PostgreSQL for production by changing one property</li>
+                        <li><strong>JWT Authentication</strong> — Stateless authentication ideal for REST APIs. No server-side sessions needed, scales horizontally</li>
+                        <li><strong>Vanilla JS Frontend</strong> — Demonstrates core JavaScript skills without framework abstraction. Shows understanding of DOM manipulation, Fetch API, and modular code organization</li>
+                        <li><strong>Chart.js</strong> — Lightweight, responsive charting library that integrates easily without heavy dependencies</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="qa">
+                <div class="question"><span class="q-number">3</span> What architecture/design pattern does your project follow?</div>
+                <div class="answer">
+                    <p>The project follows a <strong>layered architecture</strong> (also known as N-tier architecture):</p>
+<pre>Client (Browser)
+    ↓ HTTP/JSON
+Controller Layer  → Handles HTTP requests, input validation
+    ↓
+Service Layer     → Business logic, orchestration
+    ↓
+Repository Layer  → Data access, database queries
+    ↓
+Database (H2/MySQL)</pre>
+                    <p><strong>Design patterns used:</strong></p>
+                    <ul>
+                        <li><strong>Repository Pattern</strong> — Spring Data JPA repositories abstract database operations</li>
+                        <li><strong>DTO Pattern</strong> — Data Transfer Objects decouple API responses from entity structure</li>
+                        <li><strong>Builder Pattern</strong> — Lombok's <code>@Builder</code> for clean object construction</li>
+                        <li><strong>Filter Chain Pattern</strong> — Spring Security's filter chain for request processing</li>
+                        <li><strong>Singleton Pattern</strong> — Spring beans are singletons by default</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION 2 ==================== -->
+        <div class="section">
+            <h2 class="section-title">☕ Spring Boot & Backend Questions</h2>
+
+            <div class="qa">
+                <div class="question"><span class="q-number">4</span> What is Spring Boot and why use it over plain Spring?</div>
+                <div class="answer">
+                    <p><strong>Spring Boot</strong> is an opinionated framework built on top of the Spring Framework that simplifies configuration:</p>
+                    <ul>
+                        <li><strong>Auto-configuration</strong> — Automatically configures beans based on classpath dependencies. If you add <code>spring-boot-starter-data-jpa</code>, it auto-configures a DataSource, EntityManager, etc.</li>
+                        <li><strong>Embedded Server</strong> — Ships with Tomcat embedded, so you run <code>mvn spring-boot:run</code> instead of deploying a WAR to an external server</li>
+                        <li><strong>Starter POMs</strong> — Pre-configured dependency bundles. <code>spring-boot-starter-web</code> brings in everything needed for REST APIs</li>
+                        <li><strong>Production-ready</strong> — Built-in health checks, metrics, externalized configuration</li>
+                    </ul>
+                    <p>In my project, I used starters for Web, Data JPA, Security, and Validation — each bringing in 10+ transitive dependencies that are pre-tested for compatibility.</p>
+                </div>
+            </div>
+
+            <div class="qa">
+                <div class="question"><span class="q-number">5</span> Explain Dependency Injection. How did you use it?</div>
+                <div class="answer">
+                    <p><strong>Dependency Injection (DI)</strong> is a design principle where objects receive their dependencies from an external source rather than creating them internally.</p>
+<pre>// WITHOUT DI (tightly coupled)
+public class AuthController {
+    private AuthService service = new AuthService(); // Bad!
+}
+
+// WITH DI (loosely coupled) — What I used
+@RestController
+@RequiredArgsConstructor  // Lombok generates constructor
+public class AuthController {
+    private final AuthService authService; // Spring injects this
+}</pre>
+                    <p><strong>Benefits:</strong> Loose coupling, easier testing (can mock dependencies), follows SOLID principles (Dependency Inversion).</p>
+                    <p>In my project, I used <strong>constructor injection</strong> via Lombok's <code>@RequiredArgsConstructor</code> across all controllers and services.</p>
+                </div>
+            </div>
+
+            <div class="qa">
+                <div class="question"><span class="q-number">6</span> What are the different Spring annotations you used and what do they do?</div>
+                <div class="answer">
+                    <ul>
+                        <li><code>@RestController</code> — Marks a class as a REST API controller (<code>@Controller</code> + <code>@ResponseBody</code>)</li>
+                        <li><code>@Service</code> — Marks a business logic class as a Spring-managed service bean</li>
+                        <li><code>@Repository</code> — Marks a data access interface (auto-implemented by Spring Data JPA)</li>
+                        <li><code>@Configuration</code> — Declares a class that provides <code>@Bean</code> definitions</li>
+                        <li><code>@Entity</code> — Maps a Java class to a database table (JPA)</li>
+                        <li><code>@GetMapping / @PostMapping / @PutMapping / @DeleteMapping</code> — Maps HTTP methods to handler methods</li>
+                        <li><code>@RequestBody</code> — Deserializes JSON request body into a Java object</li>
+                        <li><code>@PathVariable</code> — Extracts a value from the URL path (e.g., <code>/api/transactions/{id}</code>)</li>
+                        <li><code>@RequestParam</code> — Extracts query parameters (e.g., <code>?type=EXPENSE</code>)</li>
+                        <li><code>@AuthenticationPrincipal</code> — Injects the currently authenticated user from the JWT token</li>
+                        <li><code>@Valid</code> — Triggers bean validation annotations (<code>@NotBlank</code>, <code>@Email</code>, etc.)</li>
+                        <li><code>@Transactional</code> — Wraps a method in a database transaction (rollback on failure)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="qa">
+                <div class="question"><span class="q-number">7</span> What is a DTO and why did you use it instead of returning entities directly?</div>
+                <div class="answer">
+                    <p>A <strong>Data Transfer Object (DTO)</strong> is a plain Java object used to transfer data between layers, especially between the API and the client.</p>
+                    <p><strong>Why not return entities directly?</strong></p>
+                    <ul>
+                        <li><strong>Security</strong> — Entities may contain sensitive fields (e.g., <code>passwordHash</code>) that should never be sent to the client</li>
+                        <li><strong>Decoupling</strong> — API response shape shouldn't depend on database schema. If you rename a column, the API shouldn't break</li>
+                        <li><strong>Circular references</strong> — Entities with bidirectional relationships (User ↔ Transaction) cause infinite JSON recursion</li>
+                        <li><strong>Flexibility</strong> — DTOs can include computed fields (e.g., <code>budgetPercentage</code>) that don't exist in the entity</li>
+                    </ul>
+                    <p>In my project, <code>TransactionDTO</code> includes <code>categoryName</code>, <code>categoryIcon</code>, <code>categoryColor</code> — data from the related Category entity flattened into the response for frontend convenience.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION 3 ==================== -->
+        <div class="section">
+            <h2 class="section-title">🗄️ Database & JPA Questions</h2>
+
+            <div class="qa">
+                <div class="question"><span class="q-number">8</span> What is JPA and Hibernate? How are they related?</div>
+                <div class="answer">
+                    <ul>
+                        <li><strong>JPA (Java Persistence API)</strong> — A specification (set of interfaces) that defines how Java objects map to database tables. It's like a contract.</li>
+                        <li><strong>Hibernate</strong> — An implementation of the JPA specification. It does the actual work of converting Java objects to SQL queries.</li>
+                    </ul>
+                    <p>Analogy: JPA is like the <code>List</code> interface, and Hibernate is like the <code>ArrayList</code> implementation.</p>
+                    <p>In my project, I defined entities with JPA annotations (<code>@Entity</code>, <code>@Column</code>, <code>@ManyToOne</code>), and Hibernate auto-generated the DDL (CREATE TABLE) and all SQL queries at runtime.</p>
+                </div>
+            </div>
+
+            <div class="qa">
+                <div class="question"><span class="q-number">9</span> Explain the entity relationships in your project.</div>
+                <div class="answer">
+<pre>User (1) ──── (N) Transaction
+User (1) ──── (N) Budget
+Category (1) ── (N) Transaction
+Category (1) ── (N) Budget</pre>
+                    <ul>
+                        <li><strong>@ManyToOne</strong> — A Transaction belongs to ONE User and ONE Category. The foreign key (<code>user_id</code>, <code>category_id</code>) is on the Transaction table.</li>
+                        <li><strong>@OneToMany</strong> — A User has MANY Transactions. This is the inverse side (no foreign key here).</li>
+                        <li><strong>FetchType.LAZY</strong> — Related entities are loaded only when accessed, not eagerly with every query. This prevents loading thousands of transactions when you just need a user's name.</li>
+                        <li><strong>CascadeType.ALL</strong> — On User → Transactions: if you delete a user, all their transactions are deleted too.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="qa">
+                <div class="question"><span class="q-number">10</span> What is the N+1 query problem? Does your project handle it?</div>
+                <div class="answer">
+                    <p>The <strong>N+1 problem</strong> occurs when loading a list of entities triggers N additional queries for related data:</p>
+                    <ul>
+                        <li>1 query to load 100 transactions</li>
+                        <li>100 queries to load each transaction's category (one per transaction)</li>
+                    </ul>
+                    <p><strong>How I handle it:</strong></p>
+                    <ul>
+                        <li>Using <strong>DTOs</strong> instead of returning entities — the service layer maps entities to DTOs in Java, not in JSON serialization</li>
+                        <li>Using <strong>custom JPQL queries</strong> with explicit joins for dashboard aggregations (e.g., <code>GROUP BY t.category</code>)</li>
+                        <li>Using <strong>@ManyToOne with FetchType.EAGER</strong> on Transaction → Category (category is small, always needed)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="qa">
+                <div class="question"><span class="q-number">11</span> What is the difference between <code>ddl-auto=update</code> vs <code>create</code> vs <code>validate</code>?</div>
+                <div class="answer">
+                    <ul>
+                        <li><code>create</code> — Drops all tables and recreates them on every startup. <strong>Destroys all data!</strong></li>
+                        <li><code>create-drop</code> — Same as <code>create</code>, but also drops tables on shutdown</li>
+                        <li><code>update</code> — Adds new columns/tables but never deletes. <strong>Safe for development</strong> (what I used)</li>
+                        <li><code>validate</code> — Only checks if entities match the schema. Throws error if they don't. <strong>Safe for production</strong></li>
+                        <li><code>none</code> — Does nothing. Use with manual migration tools like Flyway</li>
+                    </ul>
+                    <div class="tip">💡 <strong>Production best practice:</strong> Use <code>validate</code> with a migration tool like Flyway or Liquibase for version-controlled schema changes.</div>
+                </div>
+            </div>
+
+            <div class="qa">
+                <div class="question"><span class="q-number">12</span> Why did you use BigDecimal for money instead of double?</div>
+                <div class="answer">
+                    <p><code>double</code> uses floating-point representation which causes rounding errors:</p>
+<pre>double result = 0.1 + 0.2;  // 0.30000000000000004 ❌</pre>
+                    <p><code>BigDecimal</code> uses exact decimal representation:</p>
+<pre>BigDecimal result = new BigDecimal("0.1")
+    .add(new BigDecimal("0.2"));  // 0.3 ✅</pre>
+                    <p>For financial applications, even a tiny rounding error compounded over thousands of transactions can lead to incorrect balances. <strong>Always use BigDecimal for money.</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION 4 ==================== -->
+        <div class="section">
+            <h2 class="section-title">🔐 Security & JWT Questions</h2>
+
+            <div class="qa">
+                <div class="question"><span class="q-number">13</span> How does JWT authentication work in your project?</div>
+                <div class="answer">
+<pre>1. REGISTRATION:
+   Client → POST /api/auth/register {username, password}
+   Server → Hash password with BCrypt → Save to DB
+   Server → Generate JWT token → Return to client
+
+2. LOGIN:
+   Client → POST /api/auth/login {username, password}
+   Server → Verify password against BCrypt hash
+   Server → Generate JWT token → Return to client
+
+3. AUTHENTICATED REQUESTS:
+   Client → GET /api/transactions
+            Header: Authorization: Bearer eyJhbGciOi...
+   Server → JwtAuthFilter intercepts the request
+          → Extracts token from Authorization header
+          → Validates token (signature, expiration)
+          → Loads user from DB
+          → Sets SecurityContext
+          → Request proceeds to controller</pre>
+                    <p>The JWT token contains the username in its payload (claims) and is signed with a secret key using <strong>HS512</strong> algorithm. It expires after 24 hours.</p>
+                </div>
+            </div>
+
+            <div class="qa">
+                <div class="question"><span class="q-number">14</span> What is the difference between authentication and authorization?</div>
+                <div class="answer">
+                    <ul>
+                        <li><strong>Authentication</strong> = "Who are you?" — Verifying the user's identity (login with username/password)</li>
+                        <li><strong>Authorization</strong> = "What can you access?" — Checking if the authenticated user has permission to access a resource</li>
+                    </ul>
+                    <p>In my project:</p>
+                    <ul>
+                        <li><strong>Authentication</strong>: <code>JwtAuthFilter</code> validates the JWT token and identifies the user</li>
+                        <li><strong>Authorization</strong>: <code>SecurityConfig</code> defines that <code>/api/auth/**</code> is public and everything else requires authentication. Additionally, each service method checks that users can only access their own data (e.g., a user can't see another user's transactions)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="qa">
+                <div class="question"><span class="q-number">15</span> Why did you disable CSRF? Isn't that a security risk?</div>
+                <div class="answer">
+                    <p><strong>CSRF (Cross-Site Request Forgery)</strong> is an attack where a malicious website tricks a user's browser into making unwanted requests to your server using their existing session cookies.</p>
+                    <p><strong>Why I disabled it:</strong></p>
+                    <ul>
+                        <li>CSRF attacks exploit <strong>cookie-based sessions</strong></li>
+                        <li>My API uses <strong>JWT tokens in the Authorization header</strong>, not cookies</li>
+                        <li>JWT tokens are <strong>not automatically attached</strong> by the browser (unlike cookies), so CSRF attacks can't work</li>
+                        <li>REST APIs are typically stateless and don't use sessions</li>
+                    </ul>
+                    <div class="tip">💡 <strong>Rule:</strong> If you use cookies for auth → enable CSRF. If you use JWT in headers → CSRF protection is unnecessary.</div>
+                </div>
+            </div>
+
+            <div class="qa">
+                <div class="question"><span class="q-number">16</span> Why BCrypt for password hashing? How is it different from SHA-256?</div>
+                <div class="answer">
+                    <ul>
+                        <li><strong>SHA-256</strong> — Fast hash function. An attacker can try billions of password guesses per second.</li>
+                        <li><strong>BCrypt</strong> — Intentionally slow hash function with configurable "work factor". Takes ~100ms per hash, making brute-force attacks impractical.</li>
+                    </ul>
+                    <p>BCrypt also includes a <strong>random salt</strong> in each hash, so the same password produces different hashes:</p>
+<pre>"password123" → $2a$10$dXJ3SW6G7P50lGmM...  (first time)
+"password123" → $2a$10$xYz8Abc9Def1Ghi...  (second time, different!)</pre>
+                    <p>This prevents <strong>rainbow table attacks</strong> (precomputed hash lookups).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION 5 ==================== -->
+        <div class="section">
+            <h2 class="section-title">🌐 REST API & Frontend Questions</h2>
+
+            <div class="qa">
+                <div class="question"><span class="q-number">17</span> What are REST principles and how does your API follow them?</div>
+                <div class="answer">
+                    <ul>
+                        <li><strong>Resource-based URLs</strong> — <code>/api/transactions</code> (noun, not verb like <code>/getTransactions</code>)</li>
+                        <li><strong>HTTP Methods as verbs</strong> — GET (read), POST (create), PUT (update), DELETE (remove)</li>
+                        <li><strong>Stateless</strong> — Each request is self-contained with the JWT token. Server stores no session state</li>
+                        <li><strong>Proper HTTP Status Codes</strong> — 200 (OK), 201 (Created), 204 (No Content for DELETE), 400 (Bad Request), 401 (Unauthorized), 404 (Not Found)</li>
+                        <li><strong>JSON format</strong> — Request and response bodies use JSON</li>
+                    </ul>
+<pre>GET    /api/transactions      → List all (200)
+GET    /api/transactions/42   → Get one (200 or 404)
+POST   /api/transactions      → Create (201)
+PUT    /api/transactions/42   → Update (200)
+DELETE /api/transactions/42   → Delete (204)</pre>
+                </div>
+            </div>
+
+            <div class="qa">
+                <div class="question"><span class="q-number">18</span> What is CORS and how did you handle it?</div>
+                <div class="answer">
+                    <p><strong>CORS (Cross-Origin Resource Sharing)</strong> is a browser security mechanism. When the frontend (<code>http://127.0.0.1:5500</code>) calls the backend (<code>http://localhost:8080</code>), the browser blocks it because they're different origins.</p>
+                    <p><strong>How I handled it:</strong></p>
+                    <ul>
+                        <li>Created a <code>CorsConfigurationSource</code> bean that allows specific origins, methods, and headers</li>
+                        <li>Integrated it into <strong>Spring Security's filter chain</strong> using <code>.cors()</code></li>
+                        <li>This is critical because Spring Security processes requests <strong>before</strong> Spring MVC, so CORS must be handled at the security level</li>
+                    </ul>
+                    <div class="tip">💡 <strong>A common bug I fixed:</strong> Initially, CORS was configured in Spring MVC only (WebMvcConfigurer), but Spring Security blocked OPTIONS preflight requests with 403. The fix was adding <code>.cors(cors -> cors.configurationSource(...))</code> in SecurityFilterChain.</div>
+                </div>
+            </div>
+
+            <div class="qa">
+                <div class="question"><span class="q-number">19</span> How did you handle errors/exceptions globally?</div>
+                <div class="answer">
+                    <p>I created a <code>@RestControllerAdvice</code> class called <code>GlobalExceptionHandler</code> that catches all exceptions and returns consistent JSON error responses:</p>
+<pre>{
+  "status": 404,
+  "error": "Not Found",
+  "message": "Transaction not found with id: 42",
+  "timestamp": "2026-06-01T10:30:00"
+}</pre>
+                    <p>It handles:</p>
+                    <ul>
+                        <li><code>ResourceNotFoundException</code> → 404</li>
+                        <li><code>MethodArgumentNotValidException</code> (validation failures) → 400 with field-level errors</li>
+                        <li><code>IllegalArgumentException</code> → 400</li>
+                        <li>Generic <code>Exception</code> → 500 (catch-all)</li>
+                    </ul>
+                    <p><strong>Without this</strong>, Spring returns raw stack traces or inconsistent error formats.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION 6 ==================== -->
+        <div class="section">
+            <h2 class="section-title">🧠 Problem-Solving & Behavioral Questions</h2>
+
+            <div class="qa">
+                <div class="question"><span class="q-number">20</span> What was the most challenging part of this project?</div>
+                <div class="answer">
+                    <p>The most challenging part was <strong>integrating Spring Security with CORS and JWT</strong>. Specifically:</p>
+                    <ul>
+                        <li>The CORS preflight <code>OPTIONS</code> requests were being blocked by Spring Security's filter chain with <code>403 Forbidden</code></li>
+                        <li>This was tricky to debug because the <strong>browser only showed "Failed to fetch"</strong> — not the actual CORS error</li>
+                        <li>I had to understand the <strong>request processing order</strong>: Spring Security filters run before Spring MVC's CORS handler</li>
+                        <li>The fix was moving CORS configuration into a <code>CorsConfigurationSource</code> bean and integrating it directly into the <code>SecurityFilterChain</code> with <code>.cors()</code></li>
+                    </ul>
+                    <p>This taught me the importance of understanding <strong>the full request lifecycle</strong> in a Spring application.</p>
+                </div>
+            </div>
+
+            <div class="qa">
+                <div class="question"><span class="q-number">21</span> How would you deploy this to production?</div>
+                <div class="answer">
+                    <ul>
+                        <li><strong>Database</strong> — Switch from H2 to MySQL/PostgreSQL (just change <code>application.properties</code>)</li>
+                        <li><strong>JWT Secret</strong> — Move from hardcoded to environment variable (<code>${JWT_SECRET}</code>)</li>
+                        <li><strong>ddl-auto</strong> — Change from <code>update</code> to <code>validate</code>, use Flyway for migrations</li>
+                        <li><strong>Build</strong> — <code>mvn clean package</code> creates a self-contained JAR file</li>
+                        <li><strong>Deploy</strong> — Run with <code>java -jar app.jar</code> on AWS EC2, or containerize with Docker</li>
+                        <li><strong>Frontend</strong> — Serve static files via Nginx or embed them in the Spring Boot JAR</li>
+                        <li><strong>HTTPS</strong> — Add SSL/TLS certificate (Let's Encrypt)</li>
+                        <li><strong>CORS</strong> — Restrict allowed origins to the actual domain</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="qa">
+                <div class="question"><span class="q-number">22</span> If you could improve this project, what would you add?</div>
+                <div class="answer">
+                    <ul>
+                        <li><strong>Unit & Integration Tests</strong> — JUnit 5 + Mockito for services, MockMvc for controllers</li>
+                        <li><strong>Pagination</strong> — For transactions list (Spring Data's <code>Pageable</code>)</li>
+                        <li><strong>Role-based Access Control</strong> — Admin vs User roles</li>
+                        <li><strong>Recurring Transactions</strong> — Auto-create monthly rent, salary, etc.</li>
+                        <li><strong>CSV/Excel Export</strong> — Download transaction history</li>
+                        <li><strong>Email Notifications</strong> — Alert when budget exceeds limit</li>
+                        <li><strong>Docker</strong> — Containerized deployment with docker-compose</li>
+                        <li><strong>CI/CD</strong> — GitHub Actions for automated build and deploy</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="qa">
+                <div class="question"><span class="q-number">23</span> What is @Transactional and why is it important?</div>
+                <div class="answer">
+                    <p><code>@Transactional</code> wraps a method in a <strong>database transaction</strong>. If any part of the method fails, ALL database changes are rolled back.</p>
+<pre>@Transactional
+public void transferMoney(Long from, Long to, BigDecimal amount) {
+    deductFromAccount(from, amount);   // Step 1
+    addToAccount(to, amount);          // Step 2 (if this fails,
+                                       //  Step 1 is rolled back!)
+}</pre>
+                    <p>I used <code>@Transactional</code> on service methods that perform multiple database writes (e.g., creating a transaction and updating budget tracking). This ensures <strong>data consistency</strong> — you never end up in a half-completed state.</p>
+                </div>
+            </div>
+
+            <div class="qa">
+                <div class="question"><span class="q-number">24</span> How do you ensure one user cannot access another user's data?</div>
+                <div class="answer">
+                    <p>I implemented <strong>ownership verification</strong> at the service layer:</p>
+<pre>private Transaction findTransactionByIdAndUser(Long id, String username) {
+    Transaction transaction = transactionRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Transaction", "id", id));
+
+    // Security check: does this transaction belong to the requesting user?
+    if (!transaction.getUser().getUsername().equals(username)) {
+        throw new ResourceNotFoundException("Transaction", "id", id);
+    }
+    return transaction;
+}</pre>
+                    <p>Key points:</p>
+                    <ul>
+                        <li>The username comes from the <strong>JWT token</strong> (via <code>@AuthenticationPrincipal</code>), not from the request body — so it can't be faked</li>
+                        <li>If a user tries to access someone else's transaction, they get a <strong>404 Not Found</strong> (not 403) — this avoids leaking information about the existence of the resource</li>
+                        <li>All CRUD operations go through this check</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="qa">
+                <div class="question"><span class="q-number">25</span> Explain the flow of a request from frontend to database and back.</div>
+                <div class="answer">
+<pre>1. User clicks "Add Transaction" → fills form → clicks Save
+
+2. Frontend (transactions.js):
+   fetch("http://localhost:8080/api/transactions", {
+     method: "POST",
+     headers: { "Authorization": "Bearer eyJ...", "Content-Type": "application/json" },
+     body: JSON.stringify({ categoryId: 1, amount: 500, type: "EXPENSE", ... })
+   })
+
+3. Spring Security (JwtAuthFilter):
+   → Extracts JWT from Authorization header
+   → Validates signature and expiration
+   → Loads user "testuser" from database
+   → Sets SecurityContext → Request authorized ✅
+
+4. Controller (TransactionController):
+   @PostMapping → receives TransactionDTO + @AuthenticationPrincipal
+   → Calls transactionService.createTransaction(dto, username)
+
+5. Service (TransactionService):
+   → Looks up User and Category entities from repositories
+   → Creates Transaction entity with Builder pattern
+   → Calls transactionRepository.save(transaction)
+
+6. Repository → Hibernate → SQL:
+   INSERT INTO transactions (user_id, category_id, amount, type, ...) VALUES (1, 1, 500, 'EXPENSE', ...)
+
+7. Response flows back:
+   Transaction entity → toDTO() → TransactionDTO → JSON → HTTP 201 → Frontend
+   → Frontend shows toast "Transaction added!" and refreshes the dashboard</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; padding: 2rem; color: #94a3b8; font-size: 0.85rem;">
+            <p><strong>GitHub:</strong> github.com/sinchana14/personal-finance-tracker</p>
+            <p style="margin-top: 0.5rem;">Generated for interview preparation • FinTrack Personal Finance Tracker</p>
+        </div>
+    </div>
+</body>
+</html>
