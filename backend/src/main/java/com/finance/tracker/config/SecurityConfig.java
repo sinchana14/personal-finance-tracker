@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 /**
  * ============================================================
@@ -47,6 +48,7 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
+    private final CorsConfigurationSource corsConfigurationSource;
 
     /**
      * SECURITY FILTER CHAIN — Defines the security rules
@@ -60,6 +62,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            // CORS — Must be FIRST so preflight OPTIONS requests pass through
+            .cors(cors -> cors.configurationSource(corsConfigurationSource))
+
             // CSRF (Cross-Site Request Forgery) Protection
             // We DISABLE it because:
             //   - CSRF protection is for browser-based form submissions
