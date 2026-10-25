@@ -95,7 +95,7 @@ export function AuthPage() {
                   )}
                   <IconInput icon={<Mail size={16} />} type="email" placeholder="Email" value={email} onChange={setEmail} required autoComplete="email" />
                   <IconInput icon={<Lock size={16} />} type="password" placeholder={mode === 'register' ? 'Password (min 6 characters)' : 'Password'} value={password} onChange={setPassword} required minLength={6} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} />
-                  <MagneticButton type="submit" className="w-full py-3.5" disabled={busy} strength={0.15}>
+                  <MagneticButton type="submit" className="w-full" disabled={busy} strength={0.15}>
                     {busy ? 'Please wait…' : mode === 'login' ? 'Sign in' : 'Create account'} <ArrowRight size={16} />
                   </MagneticButton>
                 </form>

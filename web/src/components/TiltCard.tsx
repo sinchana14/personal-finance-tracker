@@ -12,9 +12,11 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 export function TiltCard({ children, className = '', max = 8, depth = true, style, ...rest }: Props) {
   const ref = useRef<HTMLDivElement>(null)
   const frame = useRef(0)
+  // Hold the tilt still while a button is pressed so clicks land where they started
+  const pressed = useRef(false)
 
   const onMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (e.pointerType !== 'mouse') return
+    if (e.pointerType !== 'mouse' || pressed.current) return
     const el = ref.current!
     const r = el.getBoundingClientRect()
     const px = (e.clientX - r.left) / r.width
@@ -39,11 +41,16 @@ export function TiltCard({ children, className = '', max = 8, depth = true, styl
   return (
     <div className="[perspective:1200px]" style={style}>
       <div
+        {...rest}
         ref={ref}
         onPointerMove={onMove}
-        onPointerLeave={onLeave}
+        onPointerLeave={() => {
+          pressed.current = false
+          onLeave()
+        }}
+        onPointerDown={() => (pressed.current = true)}
+        onPointerUp={() => (pressed.current = false)}
         className={`glass glare glow-border relative rounded-3xl transition-transform duration-300 ease-out will-change-transform [transform-style:preserve-3d] [transform:rotateX(var(--rx,0deg))_rotateY(var(--ry,0deg))] ${className}`}
-        {...rest}
       >
         <div className={depth ? '[transform:translateZ(28px)] [transform-style:preserve-3d] h-full' : 'h-full'}>{children}</div>
       </div>
