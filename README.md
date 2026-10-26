@@ -51,6 +51,10 @@ npm run dev
 
 The database schema lives in [`supabase/migrations`](supabase/migrations). Apply it to a new project with the Supabase CLI (`supabase db push`) or paste the files into the SQL editor in order.
 
+### Demo data
+
+To fill an account with about six months of sample data (a ₹25,000 monthly salary, everyday expenses and budgets), sign up in the app, set your email at the top of [`supabase/seed/demo_data.sql`](supabase/seed/demo_data.sql), and run it in the Supabase SQL editor. [`demo_data_reset.sql`](supabase/seed/demo_data_reset.sql) deletes all of that user's transactions and budgets again.
+
 ### Environment variables
 
 | Name | Where to find it |
