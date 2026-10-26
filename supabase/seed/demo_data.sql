@@ -1,10 +1,14 @@
 -- ============================================================
 -- FinTrack demo dataset
 -- ============================================================
--- Fills one user's account with ~6 months of realistic income,
--- expenses and budgets (amounts in INR), ending today, sized for
--- a ₹25,000 monthly salary: shared-flat rent, modest food and
--- travel spend, and roughly ₹5–10k saved each month.
+-- Fills one user's account with ~6 months of income, expenses and
+-- budgets (INR), ending today, modelled on a tight real budget:
+--   * ₹25,000 salary on the 1st, no other income
+--   * ₹10,000 rent
+--   * a credit card bill of about ₹10,000 every month
+--   * everything else (groceries, food, bus/metro/auto, bills, the odd
+--     purchase) out of the remaining ~₹5,000; no two-wheeler, so no fuel
+--   * total savings across the period end at exactly ₹900
 --
 -- Usage: set the email below, then run the whole file in the
 -- Supabase SQL editor (it runs as postgres, so RLS is bypassed).
@@ -19,15 +23,31 @@ do $$
 declare
   target_email text := 'sinchanahosmane14@gmail.com';  -- << change me
   salary numeric := 25000;
+  rent numeric := 10000;
+  final_savings numeric := 900;   -- net balance at the end of the period
+  -- Leftover per month, oldest first (sums to final_savings); the credit
+  -- card bill absorbs whatever is needed to hit it, so it varies ~₹9.5–10.5k
+  monthly_leftover numeric[] := array[300, -150, 250, 100, 350, 50];
   uid uuid;
+  cc_id bigint;
   today date := current_date;
   m date;            -- first day of the month being generated
+  idx int := 0;
   last_day int;
+  other numeric;
   i int;
 begin
   select id into uid from auth.users where email = target_email;
   if uid is null then
     raise exception 'No user with email %', target_email;
+  end if;
+
+  -- The default categories have no credit card entry, so give the user one
+  select id into cc_id from public.categories where user_id = uid and name = 'Credit Card Bill';
+  if cc_id is null then
+    insert into public.categories (user_id, name, icon, color, type)
+    values (uid, 'Credit Card Bill', '💳', '#F43F5E', 'EXPENSE')
+    returning id into cc_id;
   end if;
 
   perform setseed(0.42);
@@ -39,79 +59,70 @@ begin
   for m in
     select generate_series(date_trunc('month', today) - interval '5 months', date_trunc('month', today), interval '1 month')::date
   loop
+    idx := idx + 1;
     last_day := extract(day from (m + interval '1 month' - interval '1 day'))::int;
 
     -- ---------- income ----------
-    insert into _rows values ('Salary', salary, m, 'Monthly salary – Nimbus Software');
-    if random() < 0.4 then
-      insert into _rows values ('Freelance', round((2000 + random() * 4000) / 100) * 100, m + (14 + floor(random() * 12))::int,
-        (array['Logo design for local café', 'Poster design gig', 'Website bug fixes', 'Resume design for a friend', 'Landing page tweaks'])[1 + floor(random() * 5)::int]);
-    end if;
-    if extract(month from m)::int % 3 = 0 then
-      insert into _rows values ('Investment', round((300 + random() * 500) / 10) * 10, m + 19, 'Mutual fund SIP returns');
-    end if;
-    if extract(month from m)::int = 8 then
-      insert into _rows values ('Gift', 2000, m + 8, 'Raksha Bandhan gift');
-    end if;
-    if random() < 0.3 then
-      insert into _rows values ('Other Income', round((50 + random() * 450) / 10) * 10, m + floor(random() * 27)::int,
-        (array['Cashback credited', 'Sold old books', 'Refund – cancelled order'])[1 + floor(random() * 3)::int]);
-    end if;
+    insert into _rows values ('Salary', salary, m, 'Monthly salary');
 
     -- ---------- fixed expenses ----------
-    insert into _rows values ('Rent', 7000, m + 4, 'Room rent – shared flat');
-    insert into _rows values ('Bills & Utilities', round((400 + random() * 400) / 10) * 10, m + 9, 'Electricity bill (share)');
-    insert into _rows values ('Bills & Utilities', 499, m + 11, 'Broadband (split with flatmates)');
+    insert into _rows values ('Rent', rent, m + 2, 'Monthly rent');
+    insert into _rows values ('Bills & Utilities', round((250 + random() * 200) / 10) * 10, m + 9, 'Electricity bill (share)');
     insert into _rows values ('Bills & Utilities', 299, m + 13, 'Mobile recharge');
-    insert into _rows values ('Entertainment', 149, m + 17, 'Netflix mobile plan');
 
-    -- ---------- variable expenses ----------
+    -- ---------- variable expenses (no two-wheeler: bus, metro, auto only) ----------
     for i in 1..4 loop
-      insert into _rows values ('Groceries', round((300 + random() * 800) / 10) * 10, m + floor(random() * last_day)::int,
-        (array['Weekly vegetables & fruits', 'DMart run', 'Milk & essentials', 'Zepto top-up', 'Monthly staples'])[1 + floor(random() * 5)::int]);
+      insert into _rows values ('Groceries', round((250 + random() * 300) / 10) * 10, m + floor(random() * last_day)::int,
+        (array['Weekly vegetables & fruits', 'Milk & essentials', 'Kirana store', 'Monthly staples'])[1 + floor(random() * 4)::int]);
     end loop;
-    for i in 1..10 loop
-      insert into _rows values ('Food & Dining', round((80 + random() * 370) / 10) * 10, m + floor(random() * last_day)::int,
-        (array['Office canteen', 'Chai & snacks', 'Dosa breakfast', 'Swiggy dinner', 'Coffee with friends', 'Street food', 'Weekend biryani'])[1 + floor(random() * 7)::int]);
+    for i in 1..7 loop
+      insert into _rows values ('Food & Dining', round((60 + random() * 190) / 10) * 10, m + floor(random() * last_day)::int,
+        (array['Office canteen', 'Chai & snacks', 'Tiffin', 'Dosa breakfast', 'Street food'])[1 + floor(random() * 5)::int]);
     end loop;
-    for i in 1..8 loop
-      insert into _rows values ('Transport', round((30 + random() * 220) / 10) * 10, m + floor(random() * last_day)::int,
-        (array['Metro card top-up', 'Bus pass', 'Auto ride', 'Rapido bike taxi', 'Petrol for scooter'])[1 + floor(random() * 5)::int]);
+    insert into _rows values ('Transport', 400, m + 1, 'Monthly bus pass');
+    for i in 1..4 loop
+      insert into _rows values ('Transport', round((30 + random() * 100) / 10) * 10, m + floor(random() * last_day)::int,
+        (array['Auto ride', 'Metro', 'Shared auto', 'Bus ticket'])[1 + floor(random() * 4)::int]);
     end loop;
-    for i in 1..(1 + floor(random() * 2)::int) loop
-      insert into _rows values ('Shopping', round((299 + random() * 1700) / 10) * 10, m + floor(random() * last_day)::int,
-        (array['Meesho – kurta', 'Amazon – phone cover', 'Footwear', 'Flipkart – earphones', 'Birthday present'])[1 + floor(random() * 5)::int]);
-    end loop;
-    for i in 1..(1 + floor(random() * 2)::int) loop
-      insert into _rows values ('Entertainment', round((150 + random() * 450) / 10) * 10, m + floor(random() * last_day)::int,
-        (array['Movie tickets', 'Bowling with friends', 'Weekend trip share', 'Mobile game top-up'])[1 + floor(random() * 4)::int]);
-    end loop;
+    if random() < 0.5 then
+      insert into _rows values ('Health', round((100 + random() * 300) / 10) * 10, m + floor(random() * last_day)::int,
+        (array['Pharmacy', 'Clinic visit'])[1 + floor(random() * 2)::int]);
+    end if;
     if random() < 0.4 then
-      insert into _rows values ('Health', round((150 + random() * 850) / 10) * 10, m + floor(random() * last_day)::int,
-        (array['Pharmacy', 'Doctor consultation', 'Gym (monthly)'])[1 + floor(random() * 3)::int]);
+      insert into _rows values ('Shopping', round((199 + random() * 400) / 10) * 10, m + floor(random() * last_day)::int,
+        (array['Toiletries', 'Phone cover', 'Slippers'])[1 + floor(random() * 3)::int]);
     end if;
-    if random() < 0.3 then
-      insert into _rows values ('Education', round((299 + random() * 1200) / 10) * 10, m + floor(random() * last_day)::int,
-        (array['Udemy course', 'Technical books', 'Exam registration'])[1 + floor(random() * 3)::int]);
+    insert into _rows values ('Other Expense', round((50 + random() * 150) / 10) * 10, m + floor(random() * last_day)::int,
+      (array['Haircut', 'Laundry', 'Courier charges'])[1 + floor(random() * 3)::int]);
+
+    -- Nothing in the future
+    delete from _rows where day > today;
+
+    -- Credit card bill (due on the 20th) takes up what's left after the planned leftover
+    if m + 19 <= today then
+      select coalesce(sum(amount), 0) into other from _rows
+      where cat not in ('Salary') and day >= m and day < m + interval '1 month';
+      insert into _rows values ('Credit Card Bill', salary - other - monthly_leftover[idx], m + 19, 'Credit card bill payment');
     end if;
-    insert into _rows values ('Other Expense', round((50 + random() * 350) / 10) * 10, m + floor(random() * last_day)::int,
-      (array['Haircut', 'Laundry', 'Courier charges', 'Donation'])[1 + floor(random() * 4)::int]);
   end loop;
 
-  -- Nothing in the future
-  delete from _rows where day > today;
+  -- Land the overall balance exactly on final_savings (matters when the
+  -- current month is still partial), via the latest credit card bill
+  update _rows set amount = amount + (
+      (select sum(case when cat = 'Salary' then amount else -amount end) from _rows) - final_savings)
+  where cat = 'Credit Card Bill' and day = (select max(day) from _rows where cat = 'Credit Card Bill');
 
   insert into public.transactions (user_id, category_id, amount, type, description, transaction_date)
   select uid, c.id, r.amount, c.type, r.note, r.day
   from _rows r
-  join public.categories c on c.user_id is null and c.name = r.cat;
+  join public.categories c on c.name = r.cat and (c.user_id is null or c.user_id = uid);
 
-  -- Budgets for last month and this month
+  -- Budgets for last month and this month, sized to the ~₹5k left after rent and the card bill
   insert into public.budgets (user_id, category_id, amount_limit, budget_month, budget_year)
   select uid, c.id, b.lim, extract(month from p.m)::int, extract(year from p.m)::int
-  from (values ('Food & Dining', 2500), ('Groceries', 3000), ('Transport', 1200),
-               ('Shopping', 1500), ('Entertainment', 800), ('Bills & Utilities', 1500)) as b(cat, lim)
-  join public.categories c on c.user_id is null and c.name = b.cat
+  from (values ('Groceries', 1500), ('Food & Dining', 1200), ('Transport', 700),
+               ('Bills & Utilities', 700), ('Credit Card Bill', 10000)) as b(cat, lim)
+  join public.categories c on c.name = b.cat and (c.user_id is null or c.user_id = uid)
   cross join (values (date_trunc('month', today)::date), ((date_trunc('month', today) - interval '1 month')::date)) as p(m)
   on conflict (user_id, category_id, budget_month, budget_year) do update set amount_limit = excluded.amount_limit;
 end $$;

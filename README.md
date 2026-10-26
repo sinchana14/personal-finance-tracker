@@ -53,7 +53,7 @@ The database schema lives in [`supabase/migrations`](supabase/migrations). Apply
 
 ### Demo data
 
-To fill an account with about six months of sample data (a ₹25,000 monthly salary, everyday expenses and budgets), sign up in the app, set your email at the top of [`supabase/seed/demo_data.sql`](supabase/seed/demo_data.sql), and run it in the Supabase SQL editor. [`demo_data_reset.sql`](supabase/seed/demo_data_reset.sql) deletes all of that user's transactions and budgets again.
+To fill an account with about six months of sample data (a ₹25,000 salary, ₹10,000 rent, a ~₹10,000 credit card bill and ₹900 saved), sign up in the app, set your email at the top of [`supabase/seed/demo_data.sql`](supabase/seed/demo_data.sql), and run it in the Supabase SQL editor. [`demo_data_reset.sql`](supabase/seed/demo_data_reset.sql) deletes all of that user's transactions and budgets again.
 
 ### Environment variables
 
