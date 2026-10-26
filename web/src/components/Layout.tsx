@@ -1,4 +1,4 @@
-import { ArrowLeftRight, LayoutDashboard, LogOut, Plus, Settings, Target } from 'lucide-react'
+import { ArrowLeftRight, LayoutDashboard, LogOut, Plus, Settings, Sparkles, Target } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { createContext, useCallback, useContext, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
@@ -10,6 +10,7 @@ const NAV = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/transactions', label: 'Transactions', icon: ArrowLeftRight },
   { to: '/budgets', label: 'Budgets', icon: Target },
+  { to: '/assistant', label: 'Assistant', icon: Sparkles },
   { to: '/settings', label: 'Settings', icon: Settings },
 ]
 

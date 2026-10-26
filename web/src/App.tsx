@@ -4,6 +4,7 @@ import { CursorFX } from './components/CursorFX'
 import { Layout } from './components/Layout'
 import { AuthProvider, useAuth } from './lib/auth'
 import { supabaseConfigured } from './lib/supabase'
+import { Assistant } from './pages/Assistant'
 import { AuthPage } from './pages/AuthPage'
 import { Budgets } from './pages/Budgets'
 import { Dashboard } from './pages/Dashboard'
@@ -26,6 +27,7 @@ function Routed() {
         <Route index element={<Dashboard />} />
         <Route path="transactions" element={<Transactions />} />
         <Route path="budgets" element={<Budgets />} />
+        <Route path="assistant" element={<Assistant />} />
         <Route path="settings" element={<Settings />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
