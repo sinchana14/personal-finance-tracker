@@ -10,7 +10,13 @@
 import { ApiError, GoogleGenAI } from "npm:@google/genai@2.31.0";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
-const MODEL = Deno.env.get("GEMINI_MODEL") || "gemini-3.8-flash";
+// Free-tier models, tried in order. Busy (503) or rate-limited (429) models
+// fall through to the next one, so a demand spike on the newest model
+// doesn't surface as an error. GEMINI_MODEL, if set, is tried first.
+const MODELS = [
+  ...new Set([Deno.env.get("GEMINI_MODEL"), "gemini-3.8-flash", "gemini-3.6-flash", "gemini-2.5-flash", "gemini-3.5-flash-lite"].filter(Boolean) as string[]),
+];
+const RETRYABLE = new Set([404, 429, 500, 503, 504]);
 const MAX_TURNS = 20;
 const MAX_CHARS = 4000;
 
@@ -149,22 +155,38 @@ Deno.serve(async (req) => {
 
   const body = new ReadableStream<Uint8Array>({
     async start(controller) {
+      // Gemini names the assistant role "model"
+      const contents = history.map((t) => ({ role: t.role === "assistant" ? "model" : "user", parts: [{ text: t.content }] }));
+      let sent = false;
       try {
-        const stream = await ai.models.generateContentStream({
-          model: MODEL,
-          // Gemini names the assistant role "model"
-          contents: history.map((t) => ({ role: t.role === "assistant" ? "model" : "user", parts: [{ text: t.content }] })),
-          config: {
-            systemInstruction: `${INSTRUCTIONS}\n\n${accountContext}`,
-            maxOutputTokens: 8192,
-            abortSignal: abort.signal,
-          },
-        });
         let finish: string | undefined;
-        for await (const chunk of stream) {
-          const text = chunk.text;
-          if (text) controller.enqueue(encoder.encode(text));
-          finish = chunk.candidates?.[0]?.finishReason ?? finish;
+        for (let i = 0; ; i++) {
+          try {
+            const stream = await ai.models.generateContentStream({
+              model: MODELS[i],
+              contents,
+              config: {
+                systemInstruction: `${INSTRUCTIONS}\n\n${accountContext}`,
+                maxOutputTokens: 8192,
+                abortSignal: abort.signal,
+              },
+            });
+            for await (const chunk of stream) {
+              const text = chunk.text;
+              if (text) {
+                controller.enqueue(encoder.encode(text));
+                sent = true;
+              }
+              finish = chunk.candidates?.[0]?.finishReason ?? finish;
+            }
+            break;
+          } catch (e) {
+            // Only switch models before any of the answer has been streamed
+            const retryable = e instanceof ApiError && RETRYABLE.has(e.status);
+            if (sent || !retryable || i === MODELS.length - 1 || abort.signal.aborted) throw e;
+            console.warn(`${MODELS[i]} unavailable (${(e as ApiError).status}), trying ${MODELS[i + 1]}`);
+            await new Promise((r) => setTimeout(r, 400));
+          }
         }
         if (finish === "SAFETY" || finish === "PROHIBITED_CONTENT" || finish === "BLOCKLIST") {
           controller.enqueue(encoder.encode("\n\nSorry, I can't help with that one. Try asking about your spending, income or budgets."));
@@ -177,6 +199,7 @@ Deno.serve(async (req) => {
         if (e instanceof ApiError) {
           if (e.status === 400 || e.status === 401 || e.status === 403) msg = "The AI assistant's API key is invalid or not allowed to use this model.";
           else if (e.status === 429) msg = "The free AI quota is used up for now. Try again in a minute (or tomorrow if the daily limit is reached).";
+          else if (e.status === 503) msg = "Google's free AI models are all busy right now. Please try again in a minute.";
           else msg = `AI service error (${e.status}). Please try again.`;
         }
         console.error(e);
