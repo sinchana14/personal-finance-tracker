@@ -1,14 +1,16 @@
 // FinTrack AI assistant: answers questions about the signed-in user's own
-// finances with Claude. The user's JWT is forwarded to Supabase, so RLS
-// limits the data to their rows. Streams plain-text deltas back to the app.
+// finances with Google Gemini (free tier). The user's JWT is forwarded to
+// Supabase, so RLS limits the data to their rows. Streams plain-text deltas
+// back to the app.
 //
-// Secrets: ANTHROPIC_API_KEY (set in Supabase → Edge Functions → Secrets).
+// Secrets: GEMINI_API_KEY (set in Supabase → Edge Functions → Secrets).
+// Optional GEMINI_MODEL overrides the model below.
 // SUPABASE_URL and SUPABASE_ANON_KEY are provided by the platform.
 
-import Anthropic from "npm:@anthropic-ai/sdk";
+import { ApiError, GoogleGenAI } from "npm:@google/genai@2.31.0";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
-const MODEL = "claude-opus-5-5";
+const MODEL = Deno.env.get("GEMINI_MODEL") || "gemini-3.8-flash";
 const MAX_TURNS = 20;
 const MAX_CHARS = 4000;
 
@@ -112,9 +114,6 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return bad(405, "Method not allowed");
 
-  const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
-  if (!apiKey) return bad(500, "The AI assistant isn't configured yet (missing ANTHROPIC_API_KEY).");
-
   const auth = req.headers.get("Authorization");
   if (!auth) return bad(401, "Not signed in");
 
@@ -133,6 +132,9 @@ Deno.serve(async (req) => {
   const { data: userData, error: userError } = await supabase.auth.getUser();
   if (userError || !userData.user) return bad(401, "Not signed in");
 
+  const apiKey = Deno.env.get("GEMINI_API_KEY");
+  if (!apiKey) return bad(500, "The AI assistant isn't configured yet (missing GEMINI_API_KEY).");
+
   let accountContext: string;
   try {
     accountContext = await loadAccountContext(supabase);
@@ -140,50 +142,55 @@ Deno.serve(async (req) => {
     return bad(500, `Couldn't load your data: ${(e as Error).message}`);
   }
 
-  const client = new Anthropic({ apiKey });
-  const stream = client.beta.messages.stream({
-    model: MODEL,
-    max_tokens: 16000,
-    output_config: { effort: "low" },
-    // On a safety decline, the API re-runs the request on a suitable fallback model
-    betas: ["server-side-fallback-2026-07-01"],
-    fallbacks: "default",
-    system: [
-      { type: "text", text: INSTRUCTIONS },
-      // Account data changes rarely between turns, so cache it with the instructions
-      { type: "text", text: accountContext, cache_control: { type: "ephemeral" } },
-    ],
-    messages: turns,
-  } as Parameters<typeof client.beta.messages.stream>[0]);
-
+  const history = turns;
+  const ai = new GoogleGenAI({ apiKey });
+  const abort = new AbortController();
   const encoder = new TextEncoder();
+
   const body = new ReadableStream<Uint8Array>({
     async start(controller) {
       try {
-        for await (const event of stream) {
-          if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
-            controller.enqueue(encoder.encode(event.delta.text));
-          }
+        const stream = await ai.models.generateContentStream({
+          model: MODEL,
+          // Gemini names the assistant role "model"
+          contents: history.map((t) => ({ role: t.role === "assistant" ? "model" : "user", parts: [{ text: t.content }] })),
+          config: {
+            systemInstruction: `${INSTRUCTIONS}\n\n${accountContext}`,
+            maxOutputTokens: 8192,
+            abortSignal: abort.signal,
+          },
+        });
+        let finish: string | undefined;
+        for await (const chunk of stream) {
+          const text = chunk.text;
+          if (text) controller.enqueue(encoder.encode(text));
+          finish = chunk.candidates?.[0]?.finishReason ?? finish;
         }
-        const final = await stream.finalMessage();
-        if (final.stop_reason === "refusal") {
+        if (finish === "SAFETY" || finish === "PROHIBITED_CONTENT" || finish === "BLOCKLIST") {
           controller.enqueue(encoder.encode("\n\nSorry, I can't help with that one. Try asking about your spending, income or budgets."));
-        } else if (final.stop_reason === "max_tokens") {
+        } else if (finish === "MAX_TOKENS") {
           controller.enqueue(encoder.encode("\n\n(Answer cut short. Try a narrower question.)"));
         }
       } catch (e) {
+        if (abort.signal.aborted) return;
         let msg = "Something went wrong talking to the AI. Please try again.";
-        if (e instanceof Anthropic.AuthenticationError) msg = "The AI assistant's API key is invalid.";
-        else if (e instanceof Anthropic.RateLimitError) msg = "The AI assistant is busy right now. Try again in a minute.";
-        else if (e instanceof Anthropic.APIError) msg = `AI service error (${e.status}). Please try again.`;
+        if (e instanceof ApiError) {
+          if (e.status === 400 || e.status === 401 || e.status === 403) msg = "The AI assistant's API key is invalid or not allowed to use this model.";
+          else if (e.status === 429) msg = "The free AI quota is used up for now. Try again in a minute (or tomorrow if the daily limit is reached).";
+          else msg = `AI service error (${e.status}). Please try again.`;
+        }
         console.error(e);
         controller.enqueue(encoder.encode(`\n\n⚠️ ${msg}`));
       } finally {
-        controller.close();
+        try {
+          controller.close();
+        } catch {
+          // already closed by a client disconnect
+        }
       }
     },
     cancel() {
-      stream.abort();
+      abort.abort();
     },
   });
 
